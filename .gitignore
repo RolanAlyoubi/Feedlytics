@@ -1,0 +1,26 @@
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Data that must not be committed
+data/cache/
+data/raw/
+
+# Notebooks / OS / editors
+.ipynb_checkpoints/
+.DS_Store
+.vscode/
+.idea/
+
+# Hand-labelling samples contain third-party review text (Kaggle dataset,
+# licence not verified), so they stay local. The labelling guides are committed;
+# recreate the CSVs with: python -m scripts.make_labeling_sample
+evaluation/labeling/*.csv

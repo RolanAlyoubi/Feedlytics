@@ -1,0 +1,143 @@
+{
+  "name": "apparel_ecommerce",
+  "display_name": "Apparel e-commerce (demo)",
+  "domain_description": "customer reviews of clothing sold by an online fashion retailer",
+  "rating_scale": {"min": 1, "max": 5, "negative_max": 2, "positive_min": 4},
+  "columns": {
+    "unnamed_0": "review_id",
+    "clothing_id": "product_id",
+    "age": "age",
+    "title": "review_title",
+    "review_text": "review_text",
+    "rating": "rating",
+    "recommended_ind": "recommended",
+    "positive_feedback_count": "helpful_votes",
+    "division_name": "division",
+    "department_name": "department",
+    "class_name": "product_class"
+  },
+  "column_synonyms": {},
+  "detect_columns": [
+    "clothing_id", "recommended_ind", "positive_feedback_count",
+    "division_name", "department_name", "class_name"
+  ],
+  "value_aliases": {"division": {"Initmates": "Intimates"}},
+  "entity": {"column": "product_id", "label": "Product"},
+  "segments": [
+    {"column": "department", "label": "Department"},
+    {"column": "product_class", "label": "Class"},
+    {"column": "division", "label": "Division"},
+    {"column": "age_band", "label": "Age band"}
+  ],
+  "numeric": [
+    {
+      "column": "age", "label": "Age", "valid_range": [13, 100],
+      "bins": [0, 30, 40, 50, 60, 200],
+      "band_labels": ["Under 30", "30–39", "40–49", "50–59", "60+"],
+      "closed": "left", "band_column": "age_band"
+    },
+    {
+      "column": "helpful_votes", "label": "Helpful votes", "valid_range": [0, 100000],
+      "bins": [0, 1, 2, 5, 10, 1000000],
+      "band_labels": ["0", "1", "2–4", "5–9", "10+"],
+      "closed": "left", "band_column": "helpful_votes_band"
+    }
+  ],
+  "outcomes": [
+    {"column": "recommended", "label": "Recommended", "positive_values": ["1"], "negative_values": ["0"]}
+  ],
+  "taxonomy": {
+    "Fit & Sizing": {
+      "Runs small": "smaller or tighter than the customer's usual size",
+      "Runs large": "bigger, looser or more oversized than the customer's usual size",
+      "Wrong length": "too long or too short (hem, sleeves, inseam or torso)",
+      "Poor fit in one area": "fits badly in a specific area such as bust, waist, hips, shoulders or arms",
+      "Doesn't suit body type or height": "cut only works for certain heights or body shapes (e.g. petite, tall, curvy)",
+      "Inconsistent sizing": "sizing differs from the brand's usual sizing, between colours, or from the size chart"
+    },
+    "Fabric & Comfort": {
+      "Thin or see-through": "fabric is thin, sheer or see-through, or needs a layer underneath",
+      "Itchy or uncomfortable": "fabric is itchy, scratchy or uncomfortable to wear",
+      "Stiff, heavy or unexpected texture": "fabric is stiff, heavy, rough or a different texture than expected"
+    },
+    "Quality & Durability": {
+      "Poor construction": "problems with seams, stitching, zippers, buttons or lining",
+      "Pilling, wear or falling apart": "pills, frays, gets holes or falls apart after little wear",
+      "Damaged or shrunk in the wash": "shrinks, fades or is damaged by washing",
+      "Looks or feels cheap": "looks or feels cheaply made for what it is"
+    },
+    "Style & Design": {
+      "Unflattering cut or shape": "shape is boxy, shapeless, frumpy or unflattering",
+      "Design detail problem": "a specific design element (neckline, pockets, straps, slit, lining placement) does not work",
+      "Pattern or print disappointing": "pattern, print or embellishment is disappointing"
+    },
+    "Appearance vs Listing": {
+      "Looks different from photo or model": "looks different in person than in the product photos or on the model",
+      "Colour different from shown": "colour differs from what the listing showed"
+    },
+    "Price & Value": {
+      "Overpriced for the quality": "price is too high for the quality, or only worth buying on sale"
+    },
+    "Order & Service": {
+      "Arrived damaged or defective": "item arrived damaged, stained or defective",
+      "Wrong item or size sent": "received a different item, colour or size than ordered",
+      "Shipping or delivery problem": "late, lost or otherwise problematic shipping",
+      "Return or exchange problem": "difficulty returning or exchanging the item",
+      "Size or colour unavailable": "wanted size or colour was sold out or not offered"
+    },
+    "Other": {
+      "Other": "a complaint that fits none of the issues above"
+    }
+  },
+  "outcome_flags": {
+    "mentions_return": "the customer says they returned, will return, or sent back the item",
+    "mentions_repurchase": "the customer says they bought, or would buy, it again or in another colour/size"
+  },
+  "baseline_keywords": {
+    "issues": {
+      "Runs small": ["runs small", "run small", "too small", "too tight", "size up", "sized up", "smaller than", "snug", "couldn't zip", "could not zip"],
+      "Runs large": ["runs large", "runs big", "too big", "too large", "size down", "sized down", "huge", "swallowed", "baggy", "too loose"],
+      "Wrong length": ["too long", "too short", "length was", "sleeves were too"],
+      "Poor fit in one area": ["tight in the", "loose in the", "too tight in", "armholes", "shoulders were", "waist was"],
+      "Doesn't suit body type or height": ["for someone taller", "if you are tall", "short torso", "not for my body", "body type"],
+      "Inconsistent sizing": ["inconsistent", "sizing is off", "sizing was off", "size chart"],
+      "Thin or see-through": ["see-through", "see through", "sheer", "thin", "transparent", "need a cami", "needs a cami"],
+      "Itchy or uncomfortable": ["itchy", "scratchy", "itch", "uncomfortable"],
+      "Stiff, heavy or unexpected texture": ["stiff", "heavy", "rough", "crinkly", "plasticky"],
+      "Poor construction": ["seam", "stitching", "zipper", "lining", "unravel", "threads"],
+      "Pilling, wear or falling apart": ["pill", "hole", "fell apart", "ripped", "tore", "fray"],
+      "Damaged or shrunk in the wash": ["shrunk", "shrank", "shrink", "after washing", "after one wash", "faded"],
+      "Looks or feels cheap": ["cheap", "poor quality", "low quality"],
+      "Unflattering cut or shape": ["unflattering", "boxy", "shapeless", "frumpy", "maternity", "no shape"],
+      "Design detail problem": ["neckline", "low-cut", "low cut", "pockets", "straps", "slit", "awkward"],
+      "Pattern or print disappointing": ["print", "pattern", "embroidery"],
+      "Looks different from photo or model": ["photo", "picture", "pictured", "on the model", "online", "in person", "website"],
+      "Colour different from shown": ["color is different", "colour is different", "color was off", "not the color", "darker than", "lighter than"],
+      "Overpriced for the quality": ["overpriced", "expensive", "not worth", "pricey", "wait for a sale"],
+      "Arrived damaged or defective": ["arrived damaged", "defective", "stain", "damaged"],
+      "Wrong item or size sent": ["sent the wrong", "received the wrong", "wrong size", "wrong color"],
+      "Shipping or delivery problem": ["shipping", "delivery", "never arrived", "lost package"],
+      "Return or exchange problem": ["return policy", "exchange was", "refund"],
+      "Size or colour unavailable": ["sold out", "out of stock", "wish it came in", "not available in"]
+    },
+    "praise": {
+      "Fit & Sizing": ["fits perfectly", "fit perfectly", "true to size", "tts", "fits great", "perfect fit"],
+      "Fabric & Comfort": ["soft", "comfortable", "comfy", "cozy", "lovely fabric", "nice fabric", "breathable"],
+      "Quality & Durability": ["well made", "great quality", "good quality", "high quality"],
+      "Style & Design": ["flattering", "beautiful", "gorgeous", "cute", "stylish", "pretty"],
+      "Appearance vs Listing": ["as pictured", "just like the picture", "looks like the photo", "exactly as"],
+      "Price & Value": ["worth", "great price", "good price", "on sale", "value"],
+      "Order & Service": ["fast shipping", "quick delivery", "arrived quickly"]
+    },
+    "flags": {
+      "mentions_return": ["return", "sent it back", "send it back", "going back"],
+      "mentions_repurchase": ["bought it in", "buy it in", "another color", "another colour", "second one", "ordered another", "buy another", "every color", "bought two", "buy again", "purchase again"]
+    }
+  },
+  "notes": [
+    "Source: Women's E-Commerce Clothing Reviews (Kaggle). Real, anonymised reviews; check the dataset licence before redistributing.",
+    "No review dates: trend analysis is not available for this dataset.",
+    "Review text was truncated by the source at about 500 characters; about one in six reviews (17%) ends mid-sentence.",
+    "Age is used only as banded segments."
+  ]
+}

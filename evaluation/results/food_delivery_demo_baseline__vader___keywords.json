@@ -1,0 +1,213 @@
+{
+  "n_reviews": 301,
+  "sentiment": {
+    "n": 301,
+    "accuracy": 69.4,
+    "accuracy_ci95": [
+      64.0,
+      74.4
+    ],
+    "macro_f1": 0.635,
+    "per_class": [
+      {
+        "label": "Positive",
+        "precision": 0.79,
+        "recall": 0.769,
+        "f1": 0.779,
+        "support": 147
+      },
+      {
+        "label": "Neutral",
+        "precision": 0.299,
+        "recall": 0.377,
+        "f1": 0.333,
+        "support": 53
+      },
+      {
+        "label": "Negative",
+        "precision": 0.835,
+        "recall": 0.752,
+        "f1": 0.792,
+        "support": 101
+      }
+    ],
+    "confusion": {
+      "Negative": {
+        "Positive": 6,
+        "Neutral": 9,
+        "Negative": 76
+      },
+      "Neutral": {
+        "Positive": 28,
+        "Neutral": 20,
+        "Negative": 19
+      },
+      "Positive": {
+        "Positive": 113,
+        "Neutral": 24,
+        "Negative": 6
+      }
+    }
+  },
+  "primary_topic": {
+    "n": 301,
+    "accuracy": 73.4,
+    "accuracy_ci95": [
+      68.2,
+      78.1
+    ],
+    "macro_f1": 0.753,
+    "per_class": [
+      {
+        "label": "Delivery",
+        "precision": 0.612,
+        "recall": 0.586,
+        "f1": 0.599,
+        "support": 70
+      },
+      {
+        "label": "Food Quality",
+        "precision": 0.861,
+        "recall": 0.912,
+        "f1": 0.886,
+        "support": 68
+      },
+      {
+        "label": "Order Accuracy",
+        "precision": 0.895,
+        "recall": 0.895,
+        "f1": 0.895,
+        "support": 19
+      },
+      {
+        "label": "Packaging",
+        "precision": 1.0,
+        "recall": 0.786,
+        "f1": 0.88,
+        "support": 28
+      },
+      {
+        "label": "Customer Service",
+        "precision": 1.0,
+        "recall": 0.333,
+        "f1": 0.5,
+        "support": 21
+      },
+      {
+        "label": "App",
+        "precision": 0.96,
+        "recall": 0.889,
+        "f1": 0.923,
+        "support": 27
+      },
+      {
+        "label": "Pricing",
+        "precision": 0.931,
+        "recall": 0.9,
+        "f1": 0.915,
+        "support": 30
+      },
+      {
+        "label": "Other",
+        "precision": 0.35,
+        "recall": 0.553,
+        "f1": 0.429,
+        "support": 38
+      }
+    ],
+    "confusion": {
+      "App": {
+        "Delivery": 1,
+        "Food Quality": 0,
+        "Order Accuracy": 0,
+        "Packaging": 0,
+        "Customer Service": 0,
+        "App": 24,
+        "Pricing": 0,
+        "Other": 0
+      },
+      "Customer Service": {
+        "Delivery": 0,
+        "Food Quality": 0,
+        "Order Accuracy": 0,
+        "Packaging": 0,
+        "Customer Service": 7,
+        "App": 0,
+        "Pricing": 0,
+        "Other": 0
+      },
+      "Delivery": {
+        "Delivery": 41,
+        "Food Quality": 1,
+        "Order Accuracy": 2,
+        "Packaging": 0,
+        "Customer Service": 5,
+        "App": 2,
+        "Pricing": 1,
+        "Other": 15
+      },
+      "Food Quality": {
+        "Delivery": 6,
+        "Food Quality": 62,
+        "Order Accuracy": 0,
+        "Packaging": 2,
+        "Customer Service": 2,
+        "App": 0,
+        "Pricing": 0,
+        "Other": 0
+      },
+      "Order Accuracy": {
+        "Delivery": 0,
+        "Food Quality": 0,
+        "Order Accuracy": 17,
+        "Packaging": 0,
+        "Customer Service": 0,
+        "App": 0,
+        "Pricing": 0,
+        "Other": 2
+      },
+      "Other": {
+        "Delivery": 21,
+        "Food Quality": 5,
+        "Order Accuracy": 0,
+        "Packaging": 3,
+        "Customer Service": 7,
+        "App": 1,
+        "Pricing": 2,
+        "Other": 21
+      },
+      "Packaging": {
+        "Delivery": 0,
+        "Food Quality": 0,
+        "Order Accuracy": 0,
+        "Packaging": 22,
+        "Customer Service": 0,
+        "App": 0,
+        "Pricing": 0,
+        "Other": 0
+      },
+      "Pricing": {
+        "Delivery": 1,
+        "Food Quality": 0,
+        "Order Accuracy": 0,
+        "Packaging": 1,
+        "Customer Service": 0,
+        "App": 0,
+        "Pricing": 27,
+        "Other": 0
+      }
+    }
+  },
+  "issue": {
+    "reviews_with_complaint": 132,
+    "true_issue_found_pct": 81.1,
+    "true_issue_found_ci95": [
+      73.5,
+      86.8
+    ],
+    "primary_issue_exact_pct": 78.0,
+    "reviews_without_complaint": 169,
+    "false_complaint_pct": 11.2
+  },
+  "flags": {}
+}

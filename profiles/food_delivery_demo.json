@@ -1,0 +1,120 @@
+{
+  "name": "food_delivery_demo",
+  "display_name": "Food delivery (synthetic legacy demo)",
+  "domain_description": "customer reviews of a food-delivery platform (restaurants, couriers and the ordering app)",
+  "rating_scale": {"min": 1, "max": 5, "negative_max": 2, "positive_min": 4},
+  "columns": {},
+  "column_synonyms": {
+    "restaurant_name": "restaurant",
+    "business": "restaurant",
+    "business_name": "restaurant",
+    "store": "restaurant",
+    "vendor": "restaurant",
+    "merchant": "restaurant",
+    "cuisine": "category",
+    "restaurant_category": "category",
+    "food_category": "category",
+    "delivery_time_min": "delivery_time",
+    "delivery_minutes": "delivery_time",
+    "delivery_duration": "delivery_time",
+    "delivery_mins": "delivery_time",
+    "order_total": "order_value",
+    "order_amount": "order_value",
+    "basket_value": "order_value",
+    "order_price": "order_value"
+  },
+  "detect_columns": [
+    "restaurant", "restaurant_name", "cuisine", "restaurant_category", "food_category",
+    "delivery_time", "delivery_time_min", "delivery_minutes", "delivery_duration", "delivery_mins",
+    "order_value", "order_total", "order_amount", "basket_value", "order_price"
+  ],
+  "value_aliases": {},
+  "entity": {"column": "restaurant", "label": "Restaurant"},
+  "segments": [
+    {"column": "category", "label": "Category"},
+    {"column": "delivery_time_band", "label": "Delivery time"}
+  ],
+  "numeric": [
+    {
+      "column": "delivery_time", "label": "Delivery time", "valid_range": [1, 240],
+      "bins": [0, 30, 45, 60, 90, 240],
+      "band_labels": ["≤30 min", "31–45 min", "46–60 min", "61–90 min", ">90 min"],
+      "closed": "right", "band_column": "delivery_time_band"
+    },
+    {"column": "order_value", "label": "Order value", "valid_range": [0.01, 5000.0]}
+  ],
+  "outcomes": [],
+  "taxonomy": {
+    "Delivery": {
+      "Late delivery": "order arrived later than promised or took unusually long",
+      "Courier behaviour": "rude or careless driver, ignored drop-off instructions",
+      "Order not delivered": "order never arrived, or was marked delivered but not received"
+    },
+    "Food Quality": {
+      "Cold food": "food arrived cold or lukewarm",
+      "Poor taste": "food tasted bad, bland, too salty, or quality declined",
+      "Undercooked or stale food": "raw, undercooked, stale or old food"
+    },
+    "Order Accuracy": {
+      "Missing items": "items, drinks, sauces or cutlery missing from the order",
+      "Wrong items": "received different items or someone else's order"
+    },
+    "Packaging": {
+      "Spilled or leaking": "food or drink spilled or leaked in transit",
+      "Poor packaging": "flimsy, crushed or badly arranged packaging"
+    },
+    "Customer Service": {
+      "Unresponsive support": "customer support slow, unhelpful or did not reply",
+      "Refund problems": "refund refused, delayed, or given only as credit"
+    },
+    "App": {
+      "App crashes or bugs": "app crashes, freezes, logs out or misbehaves",
+      "Payment failure": "payment declined, failed, or charged twice",
+      "Inaccurate tracking": "order tracking or status was wrong or not updated"
+    },
+    "Pricing": {
+      "Too expensive": "prices or portions poor value for money",
+      "Hidden or high fees": "delivery/service fees too high or not shown upfront",
+      "Promo not applied": "discount or promo code did not work"
+    },
+    "Other": {
+      "Other": "a complaint that fits none of the issues above"
+    }
+  },
+  "outcome_flags": {},
+  "baseline_keywords": {
+    "issues": {
+      "Late delivery": ["late", "delay", "slow", "took forever", "waited", "eta", "hour"],
+      "Courier behaviour": ["rude", "courier", "delivery guy", "left the food"],
+      "Order not delivered": ["never arrived", "never received", "not delivered", "never got"],
+      "Cold food": ["cold", "lukewarm", "reheat"],
+      "Poor taste": ["bland", "salty", "tasteless", "not good", "tasted cheap", "didn't enjoy"],
+      "Undercooked or stale food": ["undercooked", "raw", "stale", "pink inside"],
+      "Missing items": ["missing", "forgot", "only got", "not in the bag", "no sauce"],
+      "Wrong items": ["wrong", "someone else", "different"],
+      "Spilled or leaking": ["spill", "leak", "soaked", "mess"],
+      "Poor packaging": ["packaging was", "flimsy", "crushed", "squashed"],
+      "Unresponsive support": ["support never", "no answer", "copy-paste", "support just"],
+      "Refund problems": ["refund"],
+      "App crashes or bugs": ["crash", "froze", "buggy", "bug", "logged me out"],
+      "Payment failure": ["payment failed", "declined", "charged twice"],
+      "Inaccurate tracking": ["tracking", "status never"],
+      "Too expensive": ["expensive", "not worth", "too much", "prices went up"],
+      "Hidden or high fees": ["fee"],
+      "Promo not applied": ["promo code", "discount wasn't", "discount was not"]
+    },
+    "praise": {
+      "Food Quality": ["delicious", "tasty", "fresh", "flavour", "flavor", "best", "perfectly cooked", "great food"],
+      "Delivery": ["fast", "quick", "earlier than expected", "on time", "friendly"],
+      "Packaging": ["packed", "packaging", "stayed warm"],
+      "App": ["app was easy", "ordering through the app", "tracking was accurate"],
+      "Pricing": ["value", "good price", "great deal"],
+      "Customer Service": ["support sorted", "helpful support"]
+    },
+    "flags": {}
+  },
+  "notes": [
+    "SYNTHETIC data: every review, restaurant and number was generated. Patterns reflect the generator's rules, not real customers.",
+    "Kept as the legacy demo for trend analysis (it has review dates)."
+  ]
+}

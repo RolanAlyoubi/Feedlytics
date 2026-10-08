@@ -1,0 +1,85 @@
+{
+  "name": "generic",
+  "display_name": "Generic customer feedback",
+  "domain_description": "customer feedback about a product or service",
+  "rating_scale": {"min": 1, "max": 5, "negative_max": 2, "positive_min": 4},
+  "columns": {},
+  "column_synonyms": {},
+  "detect_columns": [],
+  "value_aliases": {},
+  "entity": {
+    "candidates": ["product", "product_id", "product_name", "item", "item_id", "sku",
+                   "store", "store_id", "branch", "location", "business", "business_name",
+                   "vendor", "merchant", "brand", "app", "app_name", "service"],
+    "label": null
+  },
+  "segments": [
+    {"candidates": ["category", "product_category", "department", "segment",
+                    "channel", "region", "country", "plan", "platform"]}
+  ],
+  "numeric": [],
+  "outcomes": [],
+  "taxonomy": {
+    "Product": {
+      "Defective or broken": "the product did not work, broke, or arrived faulty",
+      "Poor quality": "the product's quality was lower than expected",
+      "Not as described": "the product differed from its description or images",
+      "Missing features": "the product lacks a feature or option the customer needed"
+    },
+    "Service": {
+      "Unhelpful support": "customer support was unhelpful or did not solve the problem",
+      "Slow response": "the company was slow to respond",
+      "Rude staff": "staff were rude or unprofessional"
+    },
+    "Price": {
+      "Too expensive": "price too high for what the customer received",
+      "Unexpected charges": "hidden fees or charges the customer did not expect",
+      "Billing problem": "wrong charge, double charge, or refund issue"
+    },
+    "Usability": {
+      "Hard to use": "the product, website or app is confusing or hard to use",
+      "Bugs or errors": "software errors, crashes or broken pages",
+      "Poor instructions": "missing or unclear instructions or documentation"
+    },
+    "Delivery": {
+      "Late delivery": "arrived later than promised",
+      "Damaged on arrival": "arrived damaged",
+      "Wrong or missing items": "items were wrong or missing"
+    },
+    "Other": {
+      "Other": "a complaint that fits none of the issues above"
+    }
+  },
+  "outcome_flags": {},
+  "baseline_keywords": {
+    "issues": {
+      "Defective or broken": ["broken", "broke", "defective", "doesn't work", "stopped working", "faulty"],
+      "Poor quality": ["poor quality", "cheap", "low quality", "flimsy"],
+      "Not as described": ["not as described", "different from", "misleading"],
+      "Missing features": ["missing feature", "wish it had", "lacks"],
+      "Unhelpful support": ["support", "customer service", "no help"],
+      "Slow response": ["slow to respond", "no response", "never replied", "waiting for a reply"],
+      "Rude staff": ["rude", "unprofessional"],
+      "Too expensive": ["expensive", "overpriced", "not worth"],
+      "Unexpected charges": ["hidden fee", "extra charge", "unexpected charge"],
+      "Billing problem": ["charged twice", "billing", "refund"],
+      "Hard to use": ["confusing", "hard to use", "difficult to use", "complicated"],
+      "Bugs or errors": ["bug", "crash", "error", "glitch"],
+      "Poor instructions": ["instructions", "manual", "documentation"],
+      "Late delivery": ["late", "delayed", "took forever"],
+      "Damaged on arrival": ["arrived damaged", "damaged"],
+      "Wrong or missing items": ["missing", "wrong item"]
+    },
+    "praise": {
+      "Product": ["great product", "works well", "excellent", "love it", "high quality"],
+      "Service": ["helpful", "friendly", "great service"],
+      "Price": ["good value", "worth it", "great price", "affordable"],
+      "Usability": ["easy to use", "intuitive", "simple"],
+      "Delivery": ["fast delivery", "arrived quickly", "on time", "fast shipping"]
+    },
+    "flags": {}
+  },
+  "notes": [
+    "Generic profile: a broad topic list used when no domain profile matches the dataset. For better results, create a profile for your domain."
+  ]
+}

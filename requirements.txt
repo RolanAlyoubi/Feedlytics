@@ -6,4 +6,6 @@ anthropic>=0.125,<1         # optional: only the AI path uses it; non-AI code ru
 vaderSentiment==3.3.2
 pytest>=7.4
 
-# The dashboard (next step) will add: streamlit, plotly
+# Dashboard (app/dashboard.py)
+streamlit>=1.30,<2
+plotly>=5.18,<8

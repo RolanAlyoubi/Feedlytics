@@ -175,6 +175,85 @@ def test_baseline_uses_profile_keywords_and_flags():
     assert all(a["polarity"] == "positive" for a in praise["aspects"])
 
 
+def baseline_issues(labeller, text):
+    return {a["issue"] for a in labeller.label_one(text)["aspects"] if a["polarity"] == "negative"}
+
+
+def baseline_topics(labeller, text, polarity):
+    return {a["topic"] for a in labeller.label_one(text)["aspects"] if a["polarity"] == polarity}
+
+
+def test_baseline_thin_does_not_match_think_or_things():
+    baseline = BaselineLabeller(APPAREL)
+    for text in ["I think it's cute.", "I think I will keep it.", "Things went fine."]:
+        assert "Thin or see-through" not in baseline_issues(baseline, text), text
+
+
+def test_baseline_keywords_still_match_inflected_forms():
+    baseline = BaselineLabeller(APPAREL)
+    assert "Thin or see-through" in baseline_issues(baseline, "The fabric is thin.")
+    assert "Thin or see-through" in baseline_issues(baseline, "It is thinner than I expected.")
+    assert "Pilling, wear or falling apart" in baseline_issues(baseline, "It started pilling after one wear.")
+    assert baseline.label_one("I returned it.")["flags"]["mentions_return"] is True
+    assert baseline.label_one("Keeping it, no regrets.")["flags"]["mentions_return"] is False
+
+
+def test_baseline_negated_waist_is_not_a_fit_complaint():
+    baseline = BaselineLabeller(APPAREL)
+    assert "Poor fit in one area" not in baseline_issues(baseline, "The waist wasn't tight.")
+    assert "Poor fit in one area" in baseline_issues(baseline, "The waist was too tight.")
+
+
+def test_baseline_repurchase_flag_needs_repeat_purchase_wording():
+    baseline = BaselineLabeller(APPAREL)
+    flag = lambda text: baseline.label_one(text)["flags"]["mentions_repurchase"]
+    assert flag("Bought two of these.") is False      # a first purchase of two items
+    assert flag("I bought it in black.") is False     # a first purchase in a colour
+    assert flag("I bought it twice.") is True
+    assert flag("I'm buying another one in navy.") is True
+    assert flag("I would buy it again.") is True
+
+
+def test_baseline_listing_mismatch_needs_a_comparison():
+    baseline = BaselineLabeller(APPAREL)
+    assert "Appearance vs Listing" not in baseline_topics(baseline, "I ordered it online.", "negative")
+    assert "Appearance vs Listing" in baseline_topics(
+        baseline, "It looks darker in person than the photo.", "negative")
+
+
+def test_baseline_listing_mismatch_comparison_and_negation_phrasings():
+    baseline = BaselineLabeller(APPAREL)
+    for text in ["The stripes look louder than they appear in the photo.",
+                 "The ruffles are bigger than how they appear on the model.",
+                 "The skirt is shorter than it appeared on the site.",
+                 "It is tighter on me than it is on the model.",
+                 "It does not fit as shown on the model.",
+                 "It did not look as depicted.",
+                 "The waist is not accurately portrayed in the photo.",
+                 "Unlike the photo, the waist does not cinch.",
+                 "Nothing like the model."]:
+        assert "Appearance vs Listing" in baseline_topics(baseline, text, "negative"), text
+    for text in ["I ordered it online and it arrived on Tuesday.",
+                 "The model is wearing a size small.",
+                 "It fits as shown on the model."]:
+        assert "Appearance vs Listing" not in baseline_topics(baseline, text, "negative"), text
+
+
+def test_baseline_buying_on_sale_is_not_value_praise():
+    baseline = BaselineLabeller(APPAREL)
+    assert "Price & Value" not in baseline_topics(baseline, "Love it, got it on sale!", "positive")
+    assert "Price & Value" in baseline_topics(baseline, "Great price for the quality.", "positive")
+
+
+def test_baseline_food_keywords_match_inflections_not_longer_words():
+    # _keyword_pattern is shared by every profile.
+    baseline = BaselineLabeller(FOOD)
+    assert "Spilled or leaking" in baseline_issues(baseline, "My drink spilled everywhere.")
+    assert "Hidden or high fees" in baseline_issues(baseline, "The delivery fees were high.")
+    assert "Hidden or high fees" not in baseline_issues(baseline, "I have mixed feelings about the order.")
+    assert "Spilled or leaking" not in baseline_issues(baseline, "The app sent a message.")
+
+
 def test_save_and_load_labels_roundtrip(tmp_path):
     df = make_reviews(["runs small, will return", "lovely"], [1, 5])
     out, _ = label_reviews(df, AILabeller(FakeLLM(), APPAREL))

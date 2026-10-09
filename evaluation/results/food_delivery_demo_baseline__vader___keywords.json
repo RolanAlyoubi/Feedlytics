@@ -209,5 +209,342 @@
     "reviews_without_complaint": 169,
     "false_complaint_pct": 11.2
   },
-  "flags": {}
+  "complaint_detection": {
+    "n": 301,
+    "accuracy": 85.4,
+    "accuracy_ci95": [
+      80.9,
+      88.9
+    ],
+    "precision": 0.849,
+    "recall": 0.811,
+    "recall_ci95": [
+      73.5,
+      86.8
+    ],
+    "f1": 0.829,
+    "true_positives_in_truth": 132,
+    "predicted_positives": 126
+  },
+  "issues": {
+    "n_reviews": 301,
+    "true_labels": 155,
+    "predicted_labels": 150,
+    "micro_precision": 0.833,
+    "micro_recall": 0.806,
+    "micro_f1": 0.82,
+    "macro_f1": 0.849,
+    "exact_match_pct": 82.4,
+    "per_label": [
+      {
+        "label": "Late delivery",
+        "support": 34,
+        "predicted": 39,
+        "tp": 25,
+        "precision": 0.641,
+        "recall": 0.735,
+        "f1": 0.685
+      },
+      {
+        "label": "Missing items",
+        "support": 20,
+        "predicted": 20,
+        "tp": 20,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "Cold food",
+        "support": 17,
+        "predicted": 11,
+        "tp": 11,
+        "precision": 1.0,
+        "recall": 0.647,
+        "f1": 0.786
+      },
+      {
+        "label": "Poor packaging",
+        "support": 10,
+        "predicted": 6,
+        "tp": 6,
+        "precision": 1.0,
+        "recall": 0.6,
+        "f1": 0.75
+      },
+      {
+        "label": "Unresponsive support",
+        "support": 10,
+        "predicted": 0,
+        "tp": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      },
+      {
+        "label": "Hidden or high fees",
+        "support": 8,
+        "predicted": 8,
+        "tp": 8,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "Refund problems",
+        "support": 7,
+        "predicted": 7,
+        "tp": 7,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "Spilled or leaking",
+        "support": 7,
+        "predicted": 7,
+        "tp": 7,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "Courier behaviour",
+        "support": 6,
+        "predicted": 6,
+        "tp": 6,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "App crashes or bugs",
+        "support": 5,
+        "predicted": 5,
+        "tp": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "Poor taste",
+        "support": 5,
+        "predicted": 4,
+        "tp": 4,
+        "precision": 1.0,
+        "recall": 0.8,
+        "f1": 0.889
+      },
+      {
+        "label": "Promo not applied",
+        "support": 5,
+        "predicted": 5,
+        "tp": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "Inaccurate tracking",
+        "support": 4,
+        "predicted": 12,
+        "tp": 4,
+        "precision": 0.333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      {
+        "label": "Payment failure",
+        "support": 4,
+        "predicted": 4,
+        "tp": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "Too expensive",
+        "support": 4,
+        "predicted": 4,
+        "tp": 4,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "Order not delivered",
+        "support": 3,
+        "predicted": 3,
+        "tp": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "Undercooked or stale food",
+        "support": 3,
+        "predicted": 3,
+        "tp": 3,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "Wrong items",
+        "support": 3,
+        "predicted": 6,
+        "tp": 3,
+        "precision": 0.5,
+        "recall": 1.0,
+        "f1": 0.667
+      }
+    ]
+  },
+  "flags": {},
+  "complaint_topics": {
+    "n_reviews": 301,
+    "true_labels": 152,
+    "predicted_labels": 148,
+    "micro_precision": 0.831,
+    "micro_recall": 0.809,
+    "micro_f1": 0.82,
+    "macro_f1": 0.821,
+    "exact_match_pct": 82.7,
+    "per_label": [
+      {
+        "label": "Delivery",
+        "support": 41,
+        "predicted": 46,
+        "tp": 32,
+        "precision": 0.696,
+        "recall": 0.78,
+        "f1": 0.736
+      },
+      {
+        "label": "Food Quality",
+        "support": 24,
+        "predicted": 18,
+        "tp": 18,
+        "precision": 1.0,
+        "recall": 0.75,
+        "f1": 0.857
+      },
+      {
+        "label": "Order Accuracy",
+        "support": 23,
+        "predicted": 26,
+        "tp": 23,
+        "precision": 0.885,
+        "recall": 1.0,
+        "f1": 0.939
+      },
+      {
+        "label": "Customer Service",
+        "support": 17,
+        "predicted": 7,
+        "tp": 7,
+        "precision": 1.0,
+        "recall": 0.412,
+        "f1": 0.583
+      },
+      {
+        "label": "Packaging",
+        "support": 17,
+        "predicted": 13,
+        "tp": 13,
+        "precision": 1.0,
+        "recall": 0.765,
+        "f1": 0.867
+      },
+      {
+        "label": "Pricing",
+        "support": 17,
+        "predicted": 17,
+        "tp": 17,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "App",
+        "support": 13,
+        "predicted": 21,
+        "tp": 13,
+        "precision": 0.619,
+        "recall": 1.0,
+        "f1": 0.765
+      }
+    ]
+  },
+  "praise_topics": {
+    "n_reviews": 301,
+    "true_labels": 201,
+    "predicted_labels": 161,
+    "micro_precision": 0.876,
+    "micro_recall": 0.701,
+    "micro_f1": 0.779,
+    "macro_f1": 0.639,
+    "exact_match_pct": 78.1,
+    "per_label": [
+      {
+        "label": "Food Quality",
+        "support": 87,
+        "predicted": 86,
+        "tp": 81,
+        "precision": 0.942,
+        "recall": 0.931,
+        "f1": 0.936
+      },
+      {
+        "label": "Delivery",
+        "support": 50,
+        "predicted": 31,
+        "tp": 16,
+        "precision": 0.516,
+        "recall": 0.32,
+        "f1": 0.395
+      },
+      {
+        "label": "Pricing",
+        "support": 24,
+        "predicted": 22,
+        "tp": 22,
+        "precision": 1.0,
+        "recall": 0.917,
+        "f1": 0.957
+      },
+      {
+        "label": "Packaging",
+        "support": 17,
+        "predicted": 15,
+        "tp": 15,
+        "precision": 1.0,
+        "recall": 0.882,
+        "f1": 0.938
+      },
+      {
+        "label": "App",
+        "support": 16,
+        "predicted": 7,
+        "tp": 7,
+        "precision": 1.0,
+        "recall": 0.438,
+        "f1": 0.609
+      },
+      {
+        "label": "Customer Service",
+        "support": 7,
+        "predicted": 0,
+        "tp": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0
+      }
+    ]
+  },
+  "population_weighted": {
+    "sentiment_accuracy": 69.2,
+    "topic_accuracy": 73.2,
+    "complaint_detection_accuracy": 85.2
+  }
 }

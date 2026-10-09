@@ -3,6 +3,7 @@
   "display_name": "Apparel e-commerce (demo)",
   "domain_description": "customer reviews of clothing sold by an online fashion retailer",
   "rating_scale": {"min": 1, "max": 5, "negative_max": 2, "positive_min": 4},
+  "baseline_sentiment": {"negative_max": -0.1, "positive_min": 0.65, "complaint_penalty": 0.1},
   "columns": {
     "unnamed_0": "review_id",
     "clothing_id": "product_id",
@@ -95,23 +96,23 @@
   },
   "baseline_keywords": {
     "issues": {
+      "Poor fit in one area": ["tight in the", "loose in the", "too tight in", "armholes", "shoulders were", "waist was"],
       "Runs small": ["runs small", "run small", "too small", "too tight", "size up", "sized up", "smaller than", "snug", "couldn't zip", "could not zip"],
       "Runs large": ["runs large", "runs big", "too big", "too large", "size down", "sized down", "huge", "swallowed", "baggy", "too loose"],
       "Wrong length": ["too long", "too short", "length was", "sleeves were too"],
-      "Poor fit in one area": ["tight in the", "loose in the", "too tight in", "armholes", "shoulders were", "waist was"],
       "Doesn't suit body type or height": ["for someone taller", "if you are tall", "short torso", "not for my body", "body type"],
       "Inconsistent sizing": ["inconsistent", "sizing is off", "sizing was off", "size chart"],
-      "Thin or see-through": ["see-through", "see through", "sheer", "thin", "transparent", "need a cami", "needs a cami"],
+      "Thin or see-through": ["see-through", "see through", "sheer", "thin", "thinner", "transparent", "need a cami", "needs a cami"],
       "Itchy or uncomfortable": ["itchy", "scratchy", "itch", "uncomfortable"],
       "Stiff, heavy or unexpected texture": ["stiff", "heavy", "rough", "crinkly", "plasticky"],
       "Poor construction": ["seam", "stitching", "zipper", "lining", "unravel", "threads"],
       "Pilling, wear or falling apart": ["pill", "hole", "fell apart", "ripped", "tore", "fray"],
-      "Damaged or shrunk in the wash": ["shrunk", "shrank", "shrink", "after washing", "after one wash", "faded"],
-      "Looks or feels cheap": ["cheap", "poor quality", "low quality"],
+      "Damaged or shrunk in the wash": ["shrunk", "shrank", "shrink", "shrinkage", "after washing", "after one wash", "faded"],
+      "Looks or feels cheap": ["cheap", "cheaply", "poor quality", "low quality"],
       "Unflattering cut or shape": ["unflattering", "boxy", "shapeless", "frumpy", "maternity", "no shape"],
-      "Design detail problem": ["neckline", "low-cut", "low cut", "pockets", "straps", "slit", "awkward"],
+      "Design detail problem": ["neckline", "low-cut", "low cut", "pockets", "straps", "slit", "awkward", "awkwardly"],
       "Pattern or print disappointing": ["print", "pattern", "embroidery"],
-      "Looks different from photo or model": ["photo", "picture", "pictured", "on the model", "online", "in person", "website"],
+      "Looks different from photo or model": ["than pictured", "than the picture", "than the photo", "than in the picture", "than in the photo", "than it looks online", "than shown", "than on the model", "in person than", "different from the picture", "different from the photo", "different than the picture", "different than the photo", "not as pictured", "not like the picture", "not like the photo", "nothing like the picture", "nothing like the photo", "looks nothing like", "than they appear", "than it appears", "than it appeared", "than how they appear", "than how it appears", "than it is on the model", "nothing like the model", "not like the model", "unlike the photo", "unlike the picture", "unlike the model", "not as shown", "not fit as shown", "not look as shown", "not as depicted", "not look as depicted", "not accurately portrayed", "isn't accurately portrayed"],
       "Colour different from shown": ["color is different", "colour is different", "color was off", "not the color", "darker than", "lighter than"],
       "Overpriced for the quality": ["overpriced", "expensive", "not worth", "pricey", "wait for a sale"],
       "Arrived damaged or defective": ["arrived damaged", "defective", "stain", "damaged"],
@@ -122,22 +123,23 @@
     },
     "praise": {
       "Fit & Sizing": ["fits perfectly", "fit perfectly", "true to size", "tts", "fits great", "perfect fit"],
-      "Fabric & Comfort": ["soft", "comfortable", "comfy", "cozy", "lovely fabric", "nice fabric", "breathable"],
+      "Fabric & Comfort": ["soft", "softer", "softness", "comfortable", "comfy", "cozy", "lovely fabric", "nice fabric", "breathable"],
       "Quality & Durability": ["well made", "great quality", "good quality", "high quality"],
-      "Style & Design": ["flattering", "beautiful", "gorgeous", "cute", "stylish", "pretty"],
+      "Style & Design": ["flattering", "beautiful", "beautifully", "gorgeous", "cute", "cuter", "cutest", "stylish", "pretty"],
       "Appearance vs Listing": ["as pictured", "just like the picture", "looks like the photo", "exactly as"],
-      "Price & Value": ["worth", "great price", "good price", "on sale", "value"],
+      "Price & Value": ["worth", "great price", "good price", "value"],
       "Order & Service": ["fast shipping", "quick delivery", "arrived quickly"]
     },
     "flags": {
       "mentions_return": ["return", "sent it back", "send it back", "going back"],
-      "mentions_repurchase": ["bought it in", "buy it in", "another color", "another colour", "second one", "ordered another", "buy another", "every color", "bought two", "buy again", "purchase again"]
+      "mentions_repurchase": ["bought it twice", "bought another", "buying another", "buy another", "ordered another", "a second one", "buy it again", "buy again", "purchase again"]
     }
   },
   "notes": [
     "Source: Women's E-Commerce Clothing Reviews (Kaggle). Real, anonymised reviews; check the dataset licence before redistributing.",
     "No review dates: trend analysis is not available for this dataset.",
     "Review text was truncated by the source at about 500 characters; about one in six reviews (17%) ends mid-sentence.",
-    "Age is used only as banded segments."
+    "Age is used only as banded segments.",
+    "Sentiment: the rating is used whenever a review has one. Unrated reviews use the calibrated non-AI text baseline (calibrated against ratings on a held-out split; see evaluation/BASELINE_CALIBRATION_apparel_ecommerce.md). It is a proxy, not ground truth and not AI."
   ]
 }

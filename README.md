@@ -6,9 +6,13 @@ recommendations, and every recommendation can be traced back to a number in the 
 The business domain is plugged in as a **profile**: it isn't hard-coded.
 
 > **Project status**
-> Done: domain profiles, data cleaning, analytics, AI labelling layer (with non-AI fallback,
-> caching and weighted sampling), evaluation tooling, 170 tests.
-> Next: grounded AI-written insights and the Streamlit dashboard.
+> Done: domain profiles, data cleaning, analytics, end-to-end pipeline, AI labelling layer (with
+> non-AI fallback, caching and weighted sampling), evaluation tooling, rule-based insights and
+> recommendations, a single-page Streamlit dashboard, 252 tests.
+> **The demo runs on the non-AI baseline (VADER + keyword rules).**
+>
+> Evaluation on 200 hand-labelled apparel reviews is limited, achieving about 42% text-sentiment accuracy and 50% main-topic accuracy. The apparel evaluation and calibration reports are excluded from this repository because the dataset's redistribution terms have not been verified. These accuracy figures are indicative and should be interpreted with caution.
+> Insights are rule-based templates over the computed tables. AI-written findings are not implemented.
 >
 > **No Anthropic API access.** This project has no Anthropic API credits, so **Claude has never
 > been run on real data and its accuracy has not been measured.** The Claude integration is
@@ -82,8 +86,9 @@ explicitly (`--profile`). A new domain needs a new JSON file, not new code.
 | Non-AI baseline (VADER + keywords) and automatic fallback on API errors | ✅ |
 | Stratified AI sampling with weights, so population percentages are not inflated | ✅ |
 | Evaluation: accuracy, macro-F1, confusion matrices, Wilson CIs, hand-labelling workflow | ✅ |
-| AI-written findings with a grounding check against computed numbers | Next |
-| Streamlit dashboard with filters and a priority matrix | Next |
+| Rule-based findings and recommendations, each traced to its source table (no AI) | ✅ |
+| Streamlit dashboard: KPIs, charts, priority matrix, one segment filter, insights | ✅ |
+| AI-written findings with a grounding check against computed numbers | Not built (no API access) |
 
 ## Architecture
 
@@ -99,8 +104,11 @@ CSV ──► profiles.py: detect profile ──► data_processing.py ──►
           priority  (pandas only;           or VADER baseline) → cache           vs outcome agreement
           weighted when AI-sampled)
                          │
-                         ▼  (next)
-          insights.py: computed facts → LLM narrative → grounding check → dashboard.py
+                         ▼
+          pipeline.py: run_analysis() — clean, label, weight and build every table in one pass
+                         │
+                         ▼
+          insights.py: rule-based findings from the tables ──► dashboard.py (Streamlit)
 ```
 
 ### Repository structure
@@ -114,7 +122,10 @@ Feedlytics/
 │   ├── analytics.py          # descriptive statistics, significance tests, priority
 │   ├── llm_client.py         # the only module that calls the Claude API
 │   ├── ai_analysis.py        # AI + baseline labelling, sampling weights, cache
-│   └── evaluation.py         # metrics against ground truth
+│   ├── evaluation.py         # metrics against ground truth
+│   ├── pipeline.py           # run_analysis(): one entry point from CSV to every table
+│   ├── insights.py           # rule-based findings and recommendations from the tables
+│   └── dashboard.py          # single-page Streamlit dashboard
 ├── profiles/                 # generic.json, apparel_ecommerce.json, food_delivery_demo.json
 ├── data/
 │   ├── README.md             # dataset cards (synthetic food demo, apparel demo)
@@ -127,7 +138,7 @@ Feedlytics/
 │   ├── make_labeling_sample.py   # build a hand-labelling sample for real data
 │   └── generate_synthetic_data.py
 ├── evaluation/               # RESULTS_<profile>.md, results/*.json, labeling/
-├── tests/                    # 151 pytest tests
+├── tests/                    # 252 pytest tests
 ├── requirements.txt  pytest.ini  .env.example  .gitignore
 ```
 
@@ -141,7 +152,7 @@ Feedlytics/
 | Non-AI baseline | VADER sentiment + profile keyword rules |
 | Testing | pytest; the API is mocked at the HTTP layer |
 | Config / secrets | python-dotenv (`.env`, never committed) |
-| Dashboard *(next)* | Streamlit, Plotly |
+| Dashboard | Streamlit, Plotly |
 
 ## Why AI?
 
@@ -162,7 +173,7 @@ the model from inventing statistics.
 | Choosing which reviews the AI labels | **Python** | Stratified sample, weighted back to the population |
 | Sentiment, topic, issues, outcome flags per review | **AI** | Profile taxonomy as a JSON schema; invalid values repaired; cached |
 | Fallback when there's no API key or an API error | **Python** (VADER + keywords) | Every label records its source |
-| Findings and recommendations *(next)* | **AI** | Will receive only computed facts; numbers not in those facts get flagged |
+| Findings and recommendations | **Python** (rule-based templates) | No AI; every number comes from one named table. AI-written findings: not implemented |
 | Accuracy check | **Python** | Against ground truth or hand labels |
 
 **Sampling weights.** Labelling every review is unnecessary and expensive: about $66 for the
@@ -197,7 +208,18 @@ visible.
 
 **Analysis** ([`analytics.py`](app/analytics.py)):
 
-- Rating-based sentiment (scale from the profile) is the transparent baseline when a rating exists.
+- **Primary sentiment** (`sentiment`, with `sentiment_source`): the rating, using the profile's
+  scale, whenever a review has a usable rating. Otherwise the text label is used: Claude
+  (`text_ai`) or the non-AI baseline (`text_baseline`). For `apparel_ecommerce`, the baseline's
+  sentiment cut-offs were tuned to match star ratings (1–2★ Negative, 3★ Neutral, 4–5★ Positive)
+  on half of the data, excluding the 200 hand-labelled reviews. On the other half (11,182 reviews),
+  its text labels agree with the rating-derived sentiment 76.3% of the time (macro-F1 0.515), versus
+  57.3% for the uncalibrated rule. This is agreement with star ratings, not accuracy: ratings are only
+  a proxy, and because most reviews are positive the figure is driven mainly by the Positive class
+  (recall 0.90 versus 0.29 for Negative). Against human labels, text-sentiment accuracy is much
+  lower, about 42% on the 200 hand-labelled reviews.
+  It still misses most complaints (recall on 1–2★ reviews is 0.29). Complaint and topic labels
+  never depend on the sentiment source, and evaluations score the text label (`sentiment_ai`) alone.
 - Groups with fewer than 15 reviews are marked unreliable.
 - Numeric drivers vs rating use bands plus Spearman rank correlation.
 - Low-rating drivers report *lift* with a two-proportion z-test against the rest of the data,
@@ -227,7 +249,7 @@ and don't include names, emails or phone numbers.
 
 | Method | Data | Sentiment accuracy | Issue found | False complaints |
 |---|---|---|---|---|
-| Rating rule (no text) | synthetic, n=301 | 84.4% (95% CI 79.9–88.0) | — | — |
+| Rating rule (no text) | synthetic, n=296 | 85.8% (95% CI 81.4–89.3) | — | — |
 | Baseline: VADER + keywords | synthetic, n=301 | 69.4% (64.0–74.4) | 81.1% | 11.2% |
 | Claude | — | **not run: no Anthropic API credits** | | |
 
@@ -274,6 +296,13 @@ pip install -r requirements.txt
 ## How to run
 
 ```bash
+# Dashboard (local, non-AI baseline; opens http://localhost:8501).
+# It opens on the apparel dataset, which is not included: download the Kaggle
+# "Women's E-Commerce Clothing Reviews" CSV yourself to data/raw/reviews.csv
+# (check its licence), or upload your own CSV in the sidebar.
+streamlit run app/dashboard.py --browser.gatherUsageStats false
+# No Kaggle file? Upload `data/sample_reviews_SYNTHETIC.csv` in the sidebar to try the dashboard.
+
 # Data-quality report + analytics (profile auto-detected)
 python -m scripts.profile_dataset                          # synthetic food demo
 python -m scripts.profile_dataset data/raw/reviews.csv     # apparel demo
@@ -282,9 +311,6 @@ python -m scripts.profile_dataset my.csv --profile generic
 # Evaluate labelling locally: rating rule + baseline, no API key needed
 python -m scripts.evaluate_labels
 
-# AI path (requires Anthropic API access, which this project does not have)
-python -m scripts.evaluate_labels --ai
-
 # AI path only: free setup check (key, model, labels, cost); --smoke adds ONE ~$0.01 call
 python -m scripts.check_ai_setup
 python -m scripts.check_ai_setup --smoke
@@ -292,7 +318,7 @@ python -m scripts.check_ai_setup --smoke
 # Real data: build a hand-labelling sample, label it, then evaluate
 python -m scripts.make_labeling_sample --data data/raw/reviews.csv --n 200
 python -m scripts.evaluate_labels --data data/raw/reviews.csv \
-    --truth evaluation/labeling/apparel_ecommerce_labeled.csv --ai
+    --truth evaluation/labeling/apparel_ecommerce_labeled_audited.csv
 
 # Tests
 python -m pytest
@@ -300,7 +326,7 @@ python -m pytest
 
 ## Screenshots
 
-*(Added once the dashboard is built.)*
+*(Not captured yet.)*
 
 ## Limitations
 
@@ -319,7 +345,7 @@ python -m pytest
 
 ## Future improvements
 
-- Grounded AI insights and the dashboard (next).
+- Planned, not implemented: AI-based labelling and AI-written findings with a grounding check. The current demo uses the non-AI baseline and rule-based insights.
 - An AI-suggested taxonomy for new domains, reviewed by a person before use.
 - Regression modelling of rating and recommendation drivers.
 - Alerts when an issue's complaint rate rises significantly.
@@ -327,7 +353,8 @@ python -m pytest
 
 ## Author
 
-**Rolan Alyoubi** — *add LinkedIn / GitHub links here*
+**Rolan Alyoubi** · [LinkedIn](https://www.linkedin.com/in/rolan-alyoubi-a67288386/)
 
-Academic project. The apparel demo uses a public, anonymised Kaggle dataset; the food-delivery
-demo is synthetic.
+## License
+
+Code is licensed under MIT (see `LICENSE`). The Kaggle dataset is not included and is subject to its own terms.

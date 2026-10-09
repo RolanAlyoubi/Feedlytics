@@ -33,7 +33,7 @@ import pandas as pd
 
 from app import config
 from app.llm_client import JsonLLM, LLMError, Usage
-from app.profiles import Profile, Taxonomy, load_profile
+from app.profiles import BaselineSentiment, Profile, Taxonomy, load_profile
 
 NO_ISSUE = "None"
 POLARITIES = ("positive", "negative")
@@ -222,7 +222,16 @@ _SENTENCE = re.compile(r"(?<=[.!?])\s+|\s+(?:but|however|unfortunately)\s+", re.
 
 
 def _keyword_pattern(words: Sequence[str]) -> "re.Pattern[str]":
-    return re.compile(r"\b(?:" + "|".join(re.escape(w) for w in words) + r")", re.IGNORECASE)
+    """Whole words or phrases, plus regular endings ("return" -> "returned", "fee" -> "fees"),
+    but never the start of a longer word ("thin" -/-> "think", "fee" -/-> "feelings").
+    Irregular forms ("thinner") are listed in the profile."""
+    def variants(word: str) -> str:
+        ending = r"(?:s|d)?" if word.lower().endswith("e") else r"(?:s|es|ed|ing)?"
+        return re.escape(word) + ending
+    return re.compile(r"\b(?:" + "|".join(variants(w) for w in words) + r")(?!\w)", re.IGNORECASE)
+
+
+_FROM_PROFILE = object()  # sentinel: use the profile's baseline_sentiment, if any
 
 
 class BaselineLabeller:
@@ -230,9 +239,14 @@ class BaselineLabeller:
 
     source = "baseline"
 
-    def __init__(self, profile: Optional[Profile] = None):
+    def __init__(self, profile: Optional[Profile] = None, calibration=_FROM_PROFILE):
+        """``calibration``: omitted -> the profile's ``baseline_sentiment`` (if any);
+        a BaselineSentiment -> that calibration; None -> explicitly the default
+        (uncalibrated) rule, e.g. as the "current" comparison in the calibration search."""
         from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
         self.profile = profile or load_profile()
+        self.calibration = (self.profile.baseline_sentiment if calibration is _FROM_PROFILE
+                            else calibration)
         self._vader = SentimentIntensityAnalyzer()
         kw = self.profile.baseline_keywords
         self._issues = {i: _keyword_pattern(w) for i, w in kw.get("issues", {}).items() if w}
@@ -264,14 +278,29 @@ class BaselineLabeller:
                     if pattern.search(sentence):
                         aspects.append({"topic": topic, "polarity": "positive", "issue": NO_ISSUE})
                         break
-        sentiment = self.sentiment(text)
-        if any(a["polarity"] == "negative" for a in aspects) and sentiment == "Positive":
-            sentiment = "Neutral"  # complaint keywords outweigh polite wording
         negatives = [a for a in aspects if a["polarity"] == "negative"]
+        sentiment = self.sentiment(text)
+        if self.calibration is None and negatives and sentiment == "Positive":
+            sentiment = "Neutral"  # default rule: complaint keywords outweigh polite wording
         primary = (negatives or aspects or [{"topic": "Other"}])[0]["topic"]
         flags = {name: bool(p.search(text)) for name, p in self._flags.items()}
-        return normalize_label({"sentiment": sentiment, "primary_topic": primary, "aspects": aspects,
-                                "confidence": "low", "flags": flags}, self.profile.taxonomy)
+        label = normalize_label({"sentiment": sentiment, "primary_topic": primary, "aspects": aspects,
+                                 "confidence": "low", "flags": flags}, self.profile.taxonomy)
+        if self.calibration is not None:
+            label["sentiment"] = self.calibrated_sentiment(text, label)
+        return label
+
+    def calibrated_sentiment(self, text: str, label: Label) -> str:
+        """Calibrated rule. Complaints are counted on the final (normalised) label,
+        exactly as the calibration search counts them."""
+        c = self.calibration
+        complaints = sum(a["polarity"] == "negative" for a in label["aspects"])
+        score = self._vader.polarity_scores(text)["compound"] - c.complaint_penalty * complaints
+        if score <= c.negative_max:
+            return "Negative"
+        if score >= c.positive_min:
+            return "Positive"
+        return "Neutral"
 
     def label_batch(self, texts: Sequence[str]) -> List[Label]:
         return [self.label_one(t) for t in texts]
@@ -566,6 +595,34 @@ def _attach_labels(df: pd.DataFrame, labels: Dict[object, Label], sources: Dict[
     source = pd.Series(sources, dtype=object).reindex(out.index)
     default = pd.Series("not_sampled", index=out.index).mask(~out["has_text"], "no_text")
     out["label_source"] = source.fillna(default)
+    return resolve_sentiment(out)
+
+
+SENTIMENT_SOURCES = ("rating", "text_ai", "text_baseline")
+
+
+def resolve_sentiment(df: pd.DataFrame) -> pd.DataFrame:
+    """Choose the primary sentiment for each review and record where it came from.
+
+    - A usable rating wins: ``sentiment`` = the profile's rating-scale sentiment,
+      ``sentiment_source`` = "rating".
+    - Otherwise the text label is used: "text_ai" if Claude labelled the review,
+      "text_baseline" if the non-AI baseline did (calibrated where the profile
+      defines ``baseline_sentiment``). The baseline is a proxy, not ground truth.
+    - No rating and no text label: both columns are empty.
+
+    ``sentiment_ai`` (text only) and the aspect/issue columns are left untouched,
+    so complaint and topic detection never depend on the rating, and evaluation
+    can still score the text labeller on its own.
+    """
+    out = df.copy()
+    rated = out["sentiment_from_rating"].notna()
+    text = out["sentiment_ai"].where(is_labelled(out))
+    from_ai = out["label_source"].isin(["ai", "cache"])
+    out["sentiment"] = out["sentiment_from_rating"].where(rated, text)
+    source = np.select([rated, text.notna() & from_ai, text.notna()],
+                       ["rating", "text_ai", "text_baseline"], default="")
+    out["sentiment_source"] = pd.Series(source, index=out.index, dtype=object).replace("", None)
     return out
 
 
@@ -580,8 +637,8 @@ def explode_aspects(df: pd.DataFrame) -> pd.DataFrame:
     add up to more than the number of reviews. ``sample_weight`` is carried
     over so issue frequencies can be estimated for the whole dataset.
     """
-    keep = [c for c in ("review_id", "rating", "date", "month", "sentiment_ai", "label_source",
-                        "sample_weight") if c in df.columns]
+    keep = [c for c in ("review_id", "rating", "date", "month", "sentiment_ai", "sentiment",
+                        "sentiment_source", "label_source", "sample_weight") if c in df.columns]
     keep += [c for c in df.columns if c.startswith("flag_")]
     rows = []
     for record in df.loc[is_labelled(df), keep + ["aspects_ai"]].to_dict("records"):

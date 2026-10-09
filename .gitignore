@@ -1,5 +1,7 @@
 # Secrets
 .env
+.env.*
+!.env.example
 .streamlit/secrets.toml
 
 # Python
@@ -24,3 +26,12 @@ data/raw/
 # licence not verified), so they stay local. The labelling guides are committed;
 # recreate the CSVs with: python -m scripts.make_labeling_sample
 evaluation/labeling/*.csv
+
+# Analysis outputs (regenerate with: python -m scripts.run_analysis <csv>)
+outputs/
+
+# Apparel evaluation and calibration reports are derived from the Kaggle dataset; kept
+# local until its redistribution terms are reviewed.
+evaluation/RESULTS_apparel_ecommerce.md
+evaluation/BASELINE_CALIBRATION_apparel_ecommerce.*
+evaluation/results/apparel_ecommerce_*

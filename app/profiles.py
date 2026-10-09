@@ -60,6 +60,19 @@ class RatingScale:
 
 
 @dataclass(frozen=True)
+class BaselineSentiment:
+    """Optional calibration of the non-AI baseline's review-level sentiment.
+
+    score = VADER compound − complaint_penalty × (complaints detected);
+    score ≤ negative_max → Negative, ≥ positive_min → Positive, else Neutral.
+    Profiles without this block keep the default baseline rule.
+    """
+    negative_max: float
+    positive_min: float
+    complaint_penalty: float = 0.0
+
+
+@dataclass(frozen=True)
 class NumericSpec:
     column: str
     label: str
@@ -144,6 +157,7 @@ class Profile:
     baseline_keywords: Dict[str, Dict[str, List[str]]]
     notes: List[str]
     source: Optional[Path] = None
+    baseline_sentiment: Optional[BaselineSentiment] = None
 
     @property
     def fingerprint(self) -> str:
@@ -302,6 +316,21 @@ def parse_profile(raw: Dict, source: Optional[Path] = None) -> Profile:
         if "column" not in spec and "candidates" not in spec:
             errors.append("each segment needs 'column' or 'candidates'")
 
+    calibration = None
+    if raw.get("baseline_sentiment") is not None:
+        bs = raw["baseline_sentiment"]
+        try:
+            calibration = BaselineSentiment(negative_max=float(bs["negative_max"]),
+                                            positive_min=float(bs["positive_min"]),
+                                            complaint_penalty=float(bs.get("complaint_penalty", 0.0)))
+        except (KeyError, TypeError, ValueError):
+            errors.append("baseline_sentiment needs numeric negative_max and positive_min")
+        else:
+            if not calibration.negative_max < calibration.positive_min:
+                errors.append("baseline_sentiment: negative_max must be below positive_min")
+            if calibration.complaint_penalty < 0:
+                errors.append("baseline_sentiment: complaint_penalty must be ≥ 0")
+
     if errors:
         raise ProfileError(f"{where}: " + "; ".join(errors))
 
@@ -322,6 +351,7 @@ def parse_profile(raw: Dict, source: Optional[Path] = None) -> Profile:
         baseline_keywords={k: dict(keywords.get(k) or {}) for k in ("issues", "praise", "flags")},
         notes=list(raw.get("notes") or []),
         source=source,
+        baseline_sentiment=calibration,
     )
 
 

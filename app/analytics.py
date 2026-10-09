@@ -357,6 +357,7 @@ def low_rating_drivers(
     rest_pct = 100 * (total_low - group_low) / rest_n.replace(0, np.nan)
     out["p_value"] = [two_proportion_p_value(p1, n1, p2, n2) for p1, n1, p2, n2 in
                       zip(out["pct_low_rating"], out["reviews"], rest_pct, rest_n)]
+    out["p_value"] = pd.to_numeric(out["p_value"], errors="coerce")
     out["q_value"] = benjamini_hochberg(out["p_value"].fillna(1.0))
     out["significant"] = out["q_value"] < config.TREND_SIGNIFICANCE_LEVEL
     return out[columns].sort_values("lift", ascending=False).reset_index(drop=True)

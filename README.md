@@ -326,7 +326,15 @@ python -m pytest
 
 ## Screenshots
 
-*(Not captured yet.)*
+1. Dashboard Overview
+
+
+
+2. Ratings, Sentiment & Issue Priority
+
+
+
+3. Priority Matrix, Praise & Flags
 
 ## Limitations
 

@@ -326,15 +326,15 @@ python -m pytest
 
 ## Screenshots
 
-1. Dashboard Overview
+### 1. Dashboard Overview
+![Feedlytics Dashboard Overview](assets/Dashboard%20Overview.png)
 
+### 2. Ratings, Sentiment & Issue Priority
+![Ratings, Sentiment and Issue Priority](assets/Ratings%2C%20Sentiment%20%26%20Issue%20Priority.png)
 
+### 3. Priority Matrix, Praise & Flags
+![Priority Matrix, Praise and Flags](assets/Priority%20Matrix%2C%20Praise%20%26%20Flags.png)
 
-2. Ratings, Sentiment & Issue Priority
-
-
-
-3. Priority Matrix, Praise & Flags
 
 ## Limitations
 

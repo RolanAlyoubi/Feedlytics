@@ -333,17 +333,20 @@ def low_rating_drivers(
     two-proportion z-test, after a Benjamini–Hochberg correction because many
     groups are tested at once (``q_value`` < 0.05). Small groups can show
     large lifts by chance, so read lifts without significance with caution.
+    ``reviews`` and the ``min_count`` rule count only reviews with a valid
+    rating, so group sizes match the shares and the test.
     This shows association, not cause. Needs a rating column.
     """
     columns = ["dimension", "group", "reviews", "pct_low_rating", "lift", "p_value", "q_value",
                "significant"]
     rated = _column(df, "rating", float).dropna()
+    rated_df = df.loc[rated.index]
     overall = (rated <= scale.negative_max).mean() * 100 if len(rated) else 0
     total_low, total_rated = (rated <= scale.negative_max).sum(), len(rated)
     frames: List[pd.DataFrame] = []
     for dim in dimensions:
         col = dim[0] if isinstance(dim, tuple) else dim
-        summary = group_summary(df, col, min_count=min_count, scale=scale)
+        summary = group_summary(rated_df, col, min_count=min_count, scale=scale)
         summary = summary[summary["reliable"]]
         if summary.empty:
             continue

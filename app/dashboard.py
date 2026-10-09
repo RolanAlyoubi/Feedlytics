@@ -30,8 +30,9 @@ APPAREL = ROOT / "data" / "raw" / "reviews.csv"
 CAVEAT = (
     "**Method: non-AI baseline, not AI.** Topics, issues, praise and flags come from VADER sentiment "
     "plus keyword rules. On 200 hand-labelled apparel reviews this baseline reached roughly 42% text-"
-    "sentiment accuracy and 50% main-topic accuracy (`evaluation/RESULTS_apparel_ecommerce.md`), so "
-    "treat label-based figures as indicative. Overall sentiment uses the star rating whenever a review "
+    "sentiment accuracy and 50% main-topic accuracy (local report "
+    "`evaluation/RESULTS_apparel_ecommerce.md`, not published in the repository), so treat label-based "
+    "figures as indicative. Overall sentiment uses the star rating whenever a review "
     "has one. No AI service is called and uploaded data stays on this machine."
 )
 

@@ -122,6 +122,21 @@ def test_low_rating_drivers_lift():
     assert top["group"] == "Bad" and top["lift"] == 2.0  # 100% vs 50% overall
 
 
+def test_low_rating_drivers_count_only_rated_reviews():
+    # A: 20 rated (10 low) + 20 unrated. B: 40 rated (4 low).
+    # C: 10 rated (2 low) + 10 unrated: 20 rows, but too few rated reviews to test.
+    rows = ([(1, "2025-01-01", "A")] * 10 + [(5, "2025-01-01", "A")] * 10
+            + [(np.nan, "2025-01-01", "A")] * 20
+            + [(1, "2025-01-01", "B")] * 4 + [(5, "2025-01-01", "B")] * 36
+            + [(1, "2025-01-01", "C")] * 2 + [(5, "2025-01-01", "C")] * 8
+            + [(np.nan, "2025-01-01", "C")] * 10)
+    out = analytics.low_rating_drivers(make_df(rows), dimensions=("restaurant",)).set_index("group")
+    assert set(out.index) == {"A", "B"}
+    assert out.loc["A", "reviews"] == 20 and out.loc["A", "pct_low_rating"] == 50.0
+    # Rest of the data for A: B + C = 50 rated reviews, 6 low (12%).
+    assert out.loc["A", "p_value"] == analytics.two_proportion_p_value(50.0, 20, 12.0, 50)
+
+
 def test_recent_change_detects_real_increase_only():
     rows = []
     # Restaurant A: 10% negative before, 60% negative recently (clear change).

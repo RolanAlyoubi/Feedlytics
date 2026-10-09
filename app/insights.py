@@ -134,9 +134,11 @@ def _low_rating_segments(result: AnalysisResult) -> List[Insight]:
     for _, row in df.head(TOP_N).iterrows():
         small = _is_small(row["reviews"])
         q = _number(row["q_value"])
+        # q-values are rounded to 4 decimals upstream, so 0 means "below 0.0001", not zero.
+        q_text = "= n/a" if q is None else "< 0.0001" if q < 0.0001 else f"= {q:.3g}"
         detail = (f"{_fmt(row['pct_low_rating'])}% low ratings, {_fmt(row['lift'])}x the overall rate "
                   f"({_count(row['reviews'])} reviews; significant after multiple-testing correction, "
-                  f"q = {'n/a' if q is None else f'{q:.3g}'}). This is an association, not a cause.")
+                  f"q {q_text}). This is an association, not a cause.")
         items.append(Insight("finding", f"Low ratings concentrated in {row['dimension']} = {row['group']}",
                              _with_warning(detail, small), "low_rating_drivers",
                              "Observed star ratings (no text labels)", small))

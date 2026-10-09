@@ -1,1 +1,1 @@
-"""Feedlytics — AI-Powered Customer Insights."""
+"""Feedlytics — Customer Feedback Analytics."""

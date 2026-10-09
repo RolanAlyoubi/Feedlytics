@@ -1,4 +1,4 @@
-# Feedlytics — AI-Powered Customer Insights
+# Feedlytics — Customer Feedback Analytics
 
 Feedlytics is a domain-neutral customer-feedback analytics platform. It turns unstructured
 reviews, survey comments or support feedback into ranked problems and evidence-backed
@@ -6,12 +6,13 @@ recommendations, and every recommendation can be traced back to a number in the 
 The business domain is plugged in as a **profile**: it isn't hard-coded.
 
 > **Project status**
-> Done: domain profiles, data cleaning, analytics, end-to-end pipeline, AI labelling layer (with
-> non-AI fallback, caching and weighted sampling), evaluation tooling, rule-based insights and
-> recommendations, a single-page Streamlit dashboard, 252 tests.
+> Done: domain profiles, data cleaning, analytics, end-to-end pipeline, evaluation tooling,
+> rule-based insights and recommendations, a single-page Streamlit dashboard, a pytest suite.
+> Experimental: a Claude labelling layer (with non-AI fallback, caching and weighted sampling),
+> tested only against a mocked API.
 > **The demo runs on the non-AI baseline (VADER + keyword rules).**
 >
-> Evaluation on 200 hand-labelled apparel reviews is limited, achieving about 42% text-sentiment accuracy and 50% main-topic accuracy. The apparel evaluation and calibration reports are excluded from this repository because the dataset's redistribution terms have not been verified. These accuracy figures are indicative and should be interpreted with caution.
+> Evaluation on 200 hand-labelled apparel reviews is limited, achieving about 42% text-sentiment accuracy (95% CI 34.9–48.4%) and 50% main-topic accuracy. These are unweighted accuracies on a sample that over-represents low ratings (100 low-, 50 mid- and 50 high-rated reviews), so they do not estimate accuracy on the full dataset. The apparel evaluation and calibration reports are excluded from this repository because the dataset's redistribution terms have not been verified. These accuracy figures are indicative and should be interpreted with caution.
 > Insights are rule-based templates over the computed tables. AI-written findings are not implemented.
 >
 > **No Anthropic API access.** This project has no Anthropic API credits, so **Claude has never
@@ -35,12 +36,15 @@ Teams struggle to answer:
 
 ## Objective
 
-A transparent pipeline: **Data → Analysis → AI → Insight → Decision**.
+A transparent pipeline: **Data → Analysis → Text labelling → Insight → Decision**.
 
 1. Code computes every statistic with pandas.
-2. AI labels each review's text (sentiment, topic, specific issues, outcome flags). It
-   interprets text; it does not compute statistics.
-3. Outputs are labelled as *observed data*, *AI interpretation* or *recommendation*.
+2. Each review's text is labelled (sentiment, topic, specific issues, outcome flags). Labels
+   interpret text; they never compute statistics. **Today the labels come from the non-AI
+   baseline (VADER + keyword rules).** A Claude labeller is implemented as an experimental
+   option but has not been run against the real API.
+3. Outputs are labelled as *observed data*, *text labels* (non-AI baseline, or AI when
+   enabled) or *recommendation*.
 
 ## Domain profiles
 
@@ -138,7 +142,7 @@ Feedlytics/
 │   ├── make_labeling_sample.py   # build a hand-labelling sample for real data
 │   └── generate_synthetic_data.py
 ├── evaluation/               # RESULTS_<profile>.md, results/*.json, labeling/
-├── tests/                    # 252 pytest tests
+├── tests/                    # pytest suite
 ├── requirements.txt  pytest.ini  .env.example  .gitignore
 ```
 
@@ -148,7 +152,7 @@ Feedlytics/
 |---|---|
 | Language | Python 3.9+ |
 | Data | pandas, NumPy |
-| AI | Claude API (`anthropic` SDK), structured JSON output; default model `claude-opus-5-5` |
+| AI (experimental) | Claude API (`anthropic` SDK), structured JSON output; default model `claude-opus-5-5`. Tested only against a mocked API; not validated against the live API |
 | Non-AI baseline | VADER sentiment + profile keyword rules |
 | Testing | pytest; the API is mocked at the HTTP layer |
 | Config / secrets | python-dotenv (`.env`, never committed) |
@@ -167,11 +171,14 @@ the model from inventing statistics.
 
 ## How AI is used
 
+The demo and dashboard use only the non-AI steps below. The Claude steps describe the
+experimental AI path, which has been tested only against a mocked API and never run live.
+
 | Step | Done by | Notes |
 |---|---|---|
 | Cleaning, KPIs, trends, correlations, significance tests, priority | **Python** | Deterministic and tested |
-| Choosing which reviews the AI labels | **Python** | Stratified sample, weighted back to the population |
-| Sentiment, topic, issues, outcome flags per review | **AI** | Profile taxonomy as a JSON schema; invalid values repaired; cached |
+| Choosing which reviews Claude labels (AI path only) | **Python** | Stratified sample, weighted back to the population. The baseline labels every review instead |
+| Sentiment, topic, issues, outcome flags per review | **Non-AI baseline** (VADER + keywords) today; **Claude** experimental | Claude: profile taxonomy as a JSON schema; invalid values repaired; cached. Not run against the real API |
 | Fallback when there's no API key or an API error | **Python** (VADER + keywords) | Every label records its source |
 | Findings and recommendations | **Python** (rule-based templates) | No AI; every number comes from one named table. AI-written findings: not implemented |
 | Accuracy check | **Python** | Against ground truth or hand labels |
@@ -285,7 +292,7 @@ Safeguards:
 ## Installation
 
 ```bash
-git clone <your-repo-url> Feedlytics
+git clone https://github.com/RolanAlyoubi/Feedlytics.git Feedlytics
 cd Feedlytics
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate

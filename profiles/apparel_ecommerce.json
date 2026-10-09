@@ -140,6 +140,6 @@
     "No review dates: trend analysis is not available for this dataset.",
     "Review text was truncated by the source at about 500 characters; about one in six reviews (17%) ends mid-sentence.",
     "Age is used only as banded segments.",
-    "Sentiment: the rating is used whenever a review has one. Unrated reviews use the calibrated non-AI text baseline (calibrated against ratings on a held-out split; see evaluation/BASELINE_CALIBRATION_apparel_ecommerce.md). It is a proxy, not ground truth and not AI."
+    "Sentiment: the rating is used whenever a review has one. Unrated reviews use the calibrated non-AI text baseline (calibrated against ratings on a held-out split; see evaluation/BASELINE_CALIBRATION_apparel_ecommerce.md, a local report not published in the repository). It is a proxy, not ground truth and not AI."
   ]
 }
